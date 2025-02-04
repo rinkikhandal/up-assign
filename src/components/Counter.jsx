@@ -26,6 +26,7 @@ export const Counter = () => {
     <>
       <Layout>
         <div className="content-grid w-[100%]">
+          {/* commit to check */}
           <animated.div
             style={backgroundAnimation}
             className="full-width content-grid"
