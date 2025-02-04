@@ -1,0 +1,108 @@
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Young+Serif&display=swap");
+
+@import "tailwindcss";
+
+* {
+  max-width: 100%;
+}
+
+body {
+  font-family: "Poppins", serif;
+  flex-grow: 1;
+}
+
+.content-grid {
+  --padding-inline: 2rem;
+  --max-content-width: 120ch;
+  --max-breakout-width: 140ch;
+  --max-breakout-size: calc(
+    (var(--max-breakout-width) - var(--max-content-width)) / 2
+  );
+  display: grid;
+  grid-template-columns:
+    [full-width-start] minmax(var(--padding-inline), 1fr)
+    [breakout-start] minmax(0, var(--max-breakout-size))
+    [content-start] min(
+      (100% - (var(--padding-inline) * 2)),
+      var(--max-content-width)
+    )
+    [content-end] minmax(0, var(--max-breakout-size)) [breakout-end] minmax(
+      var(--padding-inline),
+      1fr
+    )
+    [full-width-end];
+}
+
+.content-grid > * {
+  grid-column: content;
+}
+.full-width {
+  grid-column: full-width;
+}
+.breakout {
+  grid-column: breakout;
+}
+
+.ql-toolbar.ql-snow {
+  width: 100%;
+}
+
+.ql-snow .ql-picker.ql-header {
+  width: 150px !important;
+}
+
+.form-container {
+  width: min(600px, 90%);
+  border: 1px solid #ccc;
+  padding: 2rem;
+}
+
+@layer components {
+  h2.heading {
+    @apply text-[max(3cqi,2rem)] mb-5 font-semibold text-center;
+  }
+  .inp-div {
+    @apply mb-3 grid grid-cols-4 gap-0 items-center;
+  }
+  .inp-div > label {
+    @apply mb-1 font-normal col-span-1;
+  }
+  .inp-div > input {
+    @apply rounded bg-neutral-100 border border-neutral-200 outline-none  tracking-wider col-span-3;
+  }
+
+  .cards > .card {
+    @apply border border-black bg-white border-solid rounded-lg  relative;
+  }
+
+  .card h3 {
+    @apply text-black;
+  }
+
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="tel"],
+  textarea {
+    @apply w-full px-4 py-2 text-sm;
+  }
+
+  .inp-div > textarea,
+  .textareaElement {
+    @apply overflow-y-auto h-auto rounded bg-neutral-100 border border-neutral-200 outline-none  tracking-wider col-span-3;
+  }
+
+  .btn {
+    @apply text-white bg-black w-full rounded-lg py-2 mt-5   transition-all tracking-wide;
+  }
+
+  .overlay-div {
+    @apply fixed h-screen w-full  bg-black/50 z-[100] flex  justify-center top-0 left-0 overflow-y-auto  px-4 pb-10 pt-16;
+    backdrop-filter: blur(2px);
+  }
+}
+
+/* .ql-snow .ql-picker:not(.ql-color-picker):not(.ql-icon-picker) svg {
+  position: absolute;
+  right: -10px;
+} */
