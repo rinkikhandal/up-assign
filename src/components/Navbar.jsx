@@ -122,7 +122,7 @@ export const Navbar = () => {
                     >
                       Log Out
                     </p>
-                    <p className="p-3 bg-neutral-800 text-white rounded-full cursor-pointer">
+                    <p className="p-3 bg-neutral-800 text-white rounded-full cursor-pointer uppercase">
                       {user && user.displayName
                         ? user.displayName
                             .split(" ")

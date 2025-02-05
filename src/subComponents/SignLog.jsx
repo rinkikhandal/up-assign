@@ -250,6 +250,7 @@ const LogInComponent = ({ switchToSignIn, closeOverlay }) => {
       localStorage.setItem("LoggedInUser", JSON.stringify(user));
       // alert("Login successful!");
       closeOverlay(); // Close the overlay after login
+      window.location.reload();
     } else {
       alert("Invalid email or password.");
     }
