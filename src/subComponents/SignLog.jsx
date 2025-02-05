@@ -9,15 +9,21 @@ export const SignLog = ({ closeOverlay, type }) => {
   return (
     <OverLay closeOverlay={closeOverlay}>
       {popupType === "SignIn" ? (
-        <SignInComponent switchToLogIn={() => setPopupType("LogIn")} />
+        <SignInComponent
+          switchToLogIn={() => setPopupType("LogIn")}
+          closeOverlay={closeOverlay}
+        />
       ) : (
-        <LogInComponent switchToSignIn={() => setPopupType("SignIn")} />
+        <LogInComponent
+          switchToSignIn={() => setPopupType("SignIn")}
+          closeOverlay={closeOverlay}
+        />
       )}
     </OverLay>
   );
 };
 
-const SignInComponent = ({ switchToLogIn }) => {
+const SignInComponent = ({ switchToLogIn, closeOverlay }) => {
   // getting google sign in from userContext
   const { googleSignIn } = UserAuth();
 
@@ -55,6 +61,7 @@ const SignInComponent = ({ switchToLogIn }) => {
     } catch (error) {
       console.log(error);
     }
+    closeOverlay();
   };
 
   return (
@@ -215,7 +222,10 @@ c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.
   );
 };
 
-const LogInComponent = ({ switchToSignIn }) => {
+const LogInComponent = ({ switchToSignIn, closeOverlay }) => {
+  // getting google sign in from userContext
+  const { googleSignIn } = UserAuth();
+
   const [credentials, setCredentials] = useState({
     email: "",
     password: "",
@@ -238,12 +248,20 @@ const LogInComponent = ({ switchToSignIn }) => {
 
     if (user) {
       localStorage.setItem("LoggedInUser", JSON.stringify(user));
-      alert("Login successful!");
-      // closeOverlay(); // Close the overlay after login
-      window.location.reload();
+      // alert("Login successful!");
+      closeOverlay(); // Close the overlay after login
     } else {
       alert("Invalid email or password.");
     }
+  };
+
+  const handleGoogleSignIn = async () => {
+    try {
+      await googleSignIn();
+    } catch (error) {
+      console.log(error);
+    }
+    closeOverlay();
   };
 
   return (
@@ -262,6 +280,7 @@ const LogInComponent = ({ switchToSignIn }) => {
         <button
           className="flex items-center justify-center w-full border border-input bg-background text-zinc-950 py-3 dark:text-white rounded-md hover:bg-black hover:text-white cursor-pointer"
           type="button"
+          onClick={handleGoogleSignIn}
         >
           <span className="mr-2">
             <svg
@@ -379,8 +398,10 @@ SignLog.propTypes = {
 
 SignInComponent.propTypes = {
   switchToLogIn: PropTypes.func.isRequired,
+  closeOverlay: PropTypes.func.isRequired,
 };
 
 LogInComponent.propTypes = {
   switchToSignIn: PropTypes.func.isRequired,
+  closeOverlay: PropTypes.func.isRequired,
 };
