@@ -6,8 +6,8 @@ import {
 import { Link } from "react-router-dom";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import { useState, useEffect } from "react";
-import { SignIn } from "../subComponents/SignIn";
-import { LogIn } from "../subComponents/LogIn";
+import { SignLog } from "../subComponents/SignLog";
+import { UserAuth } from "../Context/AuthContext";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -20,6 +20,20 @@ export const Navbar = () => {
     { name: "Editor", href: "/editor", current: false },
     { name: "UserForm", href: "/user-form", current: false },
   ]);
+
+  const { user, localUser, logOut } = UserAuth();
+
+  const handleNavbarClick = (e, href) => {
+    if (href === "/") {
+      return; // Allow navigation
+    }
+
+    if (!user && !localUser) {
+      e.preventDefault();
+      e.stopPropagation(); // Stop event from bubbling up
+      openOverlay("SignIn");
+    }
+  };
 
   // Update `current` based on the current URL path
   useEffect(() => {
@@ -36,15 +50,18 @@ export const Navbar = () => {
   const openOverlay = (type) => setOverlay({ isOpen: true, type });
   const closeOverlay = () => setOverlay({ isOpen: false, type: "" });
 
+  const handleLogoutClick = () => {
+    logOut();
+  };
+
   return (
     <>
       {/* Conditionally render SignIn or Login popup */}
-      {overlay.isOpen &&
-        (overlay.type === "SignIn" ? (
-          <SignIn closeOverlay={closeOverlay} />
-        ) : (
-          <LogIn closeOverlay={closeOverlay} />
-        ))}
+      {overlay.isOpen ? (
+        <SignLog closeOverlay={closeOverlay} type={overlay.type} />
+      ) : (
+        ""
+      )}
       <Disclosure
         as="nav"
         className="z-50 fixed left-0 right-0 top-0 h-auto full-width bg-white drop-shadow-xl"
@@ -80,6 +97,7 @@ export const Navbar = () => {
                     <Link
                       key={item.name}
                       to={item.href}
+                      onClick={(e) => handleNavbarClick(e, item.href)}
                       aria-current={item.current ? "page" : undefined}
                       className={classNames(
                         item.current
@@ -94,23 +112,43 @@ export const Navbar = () => {
                 </div>
               </div>
             </div>
-            <div className="flex gap-1">
+            <div className="">
               <section>
-                <button
-                  className="bg-neutral-800 text-white py-2 px-5 border-2 border-solid border-neutral-800 hover:bg-transparent hover:text-black transition-all rounded-sm text-sm sm:text-base"
-                  onClick={() => openOverlay("SignIn")}
-                >
-                  Sign-in
-                </button>
-              </section>
-              <section>
-                <button
-                  to="/login"
-                  className="text-neutral-500 text-sm hover:text-neutral-800 py-2 px-5 font-semibold sm:text-base"
-                  onClick={() => openOverlay("LogIn")}
-                >
-                  Login
-                </button>
+                {localUser || user ? (
+                  <div className="flex gap-1">
+                    <p
+                      className="text-neutral-500 text-sm hover:text-neutral-800 py-2 px-5 font-semibold sm:text-base cursor-pointer"
+                      onClick={handleLogoutClick}
+                    >
+                      Log Out
+                    </p>
+                    <p className="p-3 bg-neutral-800 text-white rounded-full cursor-pointer">
+                      {user && user.displayName
+                        ? user.displayName
+                            .split(" ")
+                            .map((name) => name[0])
+                            .join(" ") // Get initials
+                        : localUser && localUser.firstName && localUser.lastName
+                        ? localUser.firstName[0] + " " + localUser.lastName[0]
+                        : ""}
+                    </p>
+                  </div>
+                ) : (
+                  <div className="flex gap-1">
+                    <button
+                      className="bg-neutral-800 text-white py-2 px-5 border-2 border-solid border-neutral-800 hover:bg-transparent hover:text-black transition-all rounded-sm text-sm sm:text-base cursor-pointer"
+                      onClick={() => openOverlay("SignIn")}
+                    >
+                      Sign-in
+                    </button>
+                    <button
+                      className="text-neutral-500 text-sm hover:text-neutral-800 py-2 px-5 font-semibold sm:text-base cursor-pointer"
+                      onClick={() => openOverlay("LogIn")}
+                    >
+                      Login
+                    </button>
+                  </div>
+                )}
               </section>
             </div>
           </div>
@@ -122,6 +160,12 @@ export const Navbar = () => {
               <Link
                 key={item.name}
                 to={item.href}
+                onClick={handleNavbarClick}
+                title={
+                  item.name !== "Dashboard"
+                    ? "protected route please log In"
+                    : "unProtected route"
+                }
                 aria-current={item.current ? "page" : undefined}
                 className={classNames(
                   item.current

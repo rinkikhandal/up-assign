@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useSpring, animated } from "react-spring";
-import { Layout } from "./Layout";
 
 export const Counter = () => {
   const [count, setCount] = useState(() => {
@@ -24,7 +23,7 @@ export const Counter = () => {
 
   return (
     <>
-      <Layout>
+      <main className="flex w-[100%] min-h-[100dvh] overflow-y-auto">
         <div className="content-grid w-[100%]">
           {/* commit to check */}
           <animated.div
@@ -58,7 +57,7 @@ export const Counter = () => {
             </div>
           </animated.div>
         </div>
-      </Layout>
+      </main>
     </>
   );
 };

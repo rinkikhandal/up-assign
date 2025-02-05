@@ -4,7 +4,7 @@ export const OverLay = ({ children, closeOverlay }) => {
   return (
     <>
       <div className="overlay-div" onClick={closeOverlay}>
-        <div className="relative m-auto bg-white rounded h-48 w-[90%] max-w-[500px]  grid place-items-center z-50  py-5 px-10">
+        <div className="relative m-auto bg-white rounded h-auto w-[min(500px,90%)]  grid place-items-center z-50  py-5 px-10">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
@@ -22,7 +22,9 @@ export const OverLay = ({ children, closeOverlay }) => {
           </svg>
 
           {/* Use closeOverlay function when clicking the close button */}
-          <div className="w-full">{children}</div>
+          <div className="w-full" onClick={(e) => e.stopPropagation()}>
+            {children}
+          </div>
           {/* Render children (like the NewBatch content) */}
         </div>
       </div>

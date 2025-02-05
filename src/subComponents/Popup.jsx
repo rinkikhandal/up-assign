@@ -5,7 +5,7 @@ const Popup = ({ message, cancelPopupOpen }) => {
   return (
     <>
       <OverLay closeOverlay={cancelPopupOpen}>
-        <p className="mb-4 w-[400px]">{message}</p>
+        <p className="mb-4 ">{message}</p>
         <div className="flex justify-center gap-4">
           <button
             className="bg-neutral-800 text-white h-10 w-20 mt-10 rounded hover:bg-transparent hover:text-black border-2 border-solid border-neutral-800 transition-all "

@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import Popup from "../subComponents/Popup";
-import { Layout } from "./Layout";
 
 export const UserDataForm = () => {
   const [formData, setFormData] = useState({
@@ -72,8 +71,7 @@ export const UserDataForm = () => {
       ) : (
         ""
       )}
-
-      <Layout>
+      <main className="flex w-[100%] min-h-[100dvh] overflow-y-auto">
         <div className="content-grid  w-[100%] ">
           <div className="form-container m-auto">
             <h2 className="heading">User Data Form</h2>
@@ -129,7 +127,7 @@ export const UserDataForm = () => {
             </form>
           </div>
         </div>
-      </Layout>
+      </main>
     </>
   );
 };

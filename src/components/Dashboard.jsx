@@ -1,8 +1,7 @@
-import { Layout } from "./Layout";
 export const Dashboard = () => {
   return (
     <>
-      <Layout>
+      <main className="flex w-[100%] min-h-[100dvh] overflow-y-auto">
         <div className="content-grid w-[100%]">
           <div className="m-auto lg:pt-0 pt-20 pb-20">
             <h2 className="heading font-[Young_Serif,serif] text-center  mb-2 ">
@@ -37,7 +36,7 @@ export const Dashboard = () => {
             </div>
           </div>
         </div>
-      </Layout>
+      </main>
     </>
   );
 };

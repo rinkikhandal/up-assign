@@ -2,7 +2,6 @@ import React, { useEffect } from "react";
 import ReactQuill from "react-quill";
 import EditorToolbar, { modules, formats } from "./EditorToolbar";
 import "react-quill/dist/quill.snow.css";
-import { Layout } from "./Layout";
 
 export const RichTextEditor = () => {
   const [value, setValue] = React.useState(() => {
@@ -20,9 +19,9 @@ export const RichTextEditor = () => {
 
   return (
     <>
-      <Layout>
+      <main className="flex w-[100%] min-h-[100dvh] overflow-y-auto">
         <div className="content-grid w-[100%] ">
-          <div className="m-auto  w-[100%] ">
+          <div className="my-auto  w-[100%] ">
             <h2 className="heading mb-[20px] ">Rich Text Editor</h2>
             <div className="text-editor  text-center">
               <EditorToolbar />
@@ -38,7 +37,7 @@ export const RichTextEditor = () => {
             </div>
           </div>
         </div>
-      </Layout>
+      </main>
     </>
   );
 };
