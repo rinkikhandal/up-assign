@@ -8,12 +8,15 @@ import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import { useState, useEffect } from "react";
 import { SignLog } from "../subComponents/SignLog";
 import { UserAuth } from "../Context/AuthContext";
+import { useLocation } from "react-router-dom";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
 export const Navbar = () => {
+  const location = useLocation(); // Get current location
+
   const [navItems, setNavItems] = useState([
     { name: "Dashboard", href: "/", current: true },
     { name: "Counter", href: "/counter", current: false },
@@ -27,7 +30,6 @@ export const Navbar = () => {
     if (href === "/") {
       return; // Allow navigation
     }
-
     if (!user && !localUser) {
       e.preventDefault();
       e.stopPropagation(); // Stop event from bubbling up
