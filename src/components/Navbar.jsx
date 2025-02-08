@@ -119,12 +119,12 @@ export const Navbar = () => {
                 {localUser || user ? (
                   <div className="flex gap-1">
                     <p
-                      className="text-neutral-500 text-sm hover:text-neutral-800 py-2 px-5 font-semibold sm:text-base cursor-pointer"
+                      className="text-neutral-500 text-sm hover:text-neutral-800 py-4 px-5 font-semibold sm:text-base cursor-pointer"
                       onClick={handleLogoutClick}
                     >
                       Log Out
                     </p>
-                    <p className="p-3 bg-neutral-800 text-white rounded-full cursor-pointer uppercase">
+                    <p className="h-12 w-12 self-center place-content-center flex items-center  bg-neutral-800 text-white rounded-full cursor-pointer uppercase">
                       {user && user.displayName
                         ? user.displayName
                             .split(" ")
