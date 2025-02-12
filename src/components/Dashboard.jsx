@@ -1,3 +1,7 @@
+// import imageCounter from "../assets/img-1.jpg"; // uses relative path
+import imageCounter from "/src/assets/img-1.jpg"; //uses root directory
+// both above methods work
+
 export const Dashboard = () => {
   return (
     <>
@@ -14,7 +18,8 @@ export const Dashboard = () => {
             <div className="cards grid grid-cols-[repeat(auto-fit,minmax(300px,1fr))] gap-4">
               <section className="card  ">
                 <img
-                  src="images/img-1.jpg"
+                  src={imageCounter}
+                  // src="images/img-1.jpg"
                   alt="counter-page"
                   className=" object-center object-cover rounded-lg "
                 />

@@ -1,133 +1,93 @@
-import { useState, useEffect } from "react";
-import Popup from "../subComponents/Popup";
+import { useState, useEffect, useRef } from "react";
+// NOT OPTIMIZED FULLY-----
+const UserForm = () => {
+  const initialState = { name: "", email: "" };
+  const [formData, setFormData] = useState(initialState);
+  const [originalData, setOriginalData] = useState({});
+  const isFormChanged = useRef(false);
 
-export const UserDataForm = () => {
-  const [formData, setFormData] = useState({
-    id: "", // Auto-generated ID
-    name: "",
-    address: "",
-    email: "",
-    phone: "",
-  });
-  const [hasChanged, setHasChanged] = useState(false);
-  const [openPopup, setOpenPopup] = useState([false, ""]);
-
-  // Auto-generate ID on component mount
+  // Load stored data on mount
   useEffect(() => {
-    setFormData((prev) => ({
-      ...prev,
-      id: `user-${Date.now()}`,
-    }));
+    const storedData = JSON.parse(localStorage.getItem("userForm")) || {};
+    setFormData(storedData);
+    setOriginalData(storedData);
   }, []);
 
-  // Warn user about unsaved changes before leaving
+  // Warn user before leaving with unsaved changes
   useEffect(() => {
-    if (!hasChanged) return;
-    const handleBeforeUnload = (e) => {
-      if (hasChanged) {
-        e.preventDefault();
-        // setOpenPopup([
-        //   true,
-        //   "You have unsaved changes. Do you really want to leave?",
-        // ]);
-        // return (e.returnValue =
-        //   "You have unsaved changes. Do you really want to leave?");
+    const handleBeforeUnload = (event) => {
+      if (isFormChanged.current) {
+        event.preventDefault();
+        event.returnValue = "You have unsaved changes!";
       }
     };
+
     window.addEventListener("beforeunload", handleBeforeUnload);
     return () => window.removeEventListener("beforeunload", handleBeforeUnload);
-  }, [hasChanged]);
+  }, []);
 
+  // Handle input change and track meaningful changes
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-    setHasChanged(true);
-  };
+    const trimmedValue = value.trim();
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // Save data to localStorage
-    localStorage.setItem("userData", JSON.stringify(formData));
-    setOpenPopup([true, "Data saved successfully!"]);
-    setHasChanged(false);
-    // Reset form fields
-    setFormData({
-      id: `user-${Date.now()}`,
-      name: "",
-      address: "",
-      email: "",
-      phone: "",
+    setFormData((prev) => {
+      const updatedData = { ...prev, [name]: value };
+
+      // Detect actual changes
+      if (trimmedValue !== (originalData[name] || "").trim()) {
+        isFormChanged.current = true;
+      } else {
+        isFormChanged.current = Object.keys(updatedData).some(
+          (key) => updatedData[key].trim() !== (originalData[key] || "").trim()
+        );
+      }
+
+      return updatedData;
     });
   };
 
-  const cancelPopupOpen = () => {
-    setOpenPopup([false, ""]);
+  // Handle form submission
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const storedData = JSON.parse(localStorage.getItem("userForm")) || {};
+
+    // Only save if there are actual changes
+    if (JSON.stringify(formData).trim() !== JSON.stringify(storedData).trim()) {
+      localStorage.setItem("userForm", JSON.stringify(formData));
+      setOriginalData(formData);
+      isFormChanged.current = false;
+    }
+
+    // Reset form fields after submission
+    setFormData(initialState);
   };
 
   return (
-    <>
-      {openPopup[0] ? (
-        <Popup message={openPopup[1]} cancelPopupOpen={cancelPopupOpen} />
-      ) : (
-        ""
-      )}
-      <main className="flex w-[100%] min-h-[100dvh] overflow-y-auto">
-        <div className="content-grid  w-[100%] ">
-          <div className="form-container m-auto">
-            <h2 className="heading">User Data Form</h2>
-            <form onSubmit={handleSubmit}>
-              <div className="inp-div">
-                <label htmlFor="name">Name:</label>
-                <input
-                  type="text"
-                  id="name"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  className=""
-                  required
-                />
-              </div>
-              <div className="inp-div">
-                <label htmlFor="address">Address:</label>
-                <textarea
-                  id="address"
-                  name="address"
-                  value={formData.address}
-                  onChange={handleChange}
-                  // rows={1}
-                  required
-                />
-              </div>
-              <div className="inp-div">
-                <label htmlFor="email">Email:</label>
-                <input
-                  type="email"
-                  id="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-              <div className="inp-div">
-                <label htmlFor="phone">Phone:</label>
-                <input
-                  type="tel"
-                  id="phone"
-                  name="phone"
-                  value={formData.phone}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-              <button className="btn" type="submit">
-                Save
-              </button>
-            </form>
-          </div>
-        </div>
-      </main>
-    </>
+    <form onSubmit={handleSubmit}>
+      <label>
+        Name:{" "}
+        <input
+          type="text"
+          name="name"
+          value={formData.name}
+          onChange={handleChange}
+        />
+      </label>
+      <br />
+      <label>
+        Email:{" "}
+        <input
+          type="email"
+          name="email"
+          value={formData.email}
+          onChange={handleChange}
+        />
+      </label>
+      <br />
+      <button type="submit">Save</button>
+    </form>
   );
 };
+
+export default UserForm;
