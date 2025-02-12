@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 // NOT OPTIMIZED FULLY-----
-const UserForm = () => {
+export const UserDataForm = () => {
   const initialState = { name: "", email: "" };
   const [formData, setFormData] = useState(initialState);
   const [originalData, setOriginalData] = useState({});
@@ -89,5 +89,3 @@ const UserForm = () => {
     </form>
   );
 };
-
-export default UserForm;
