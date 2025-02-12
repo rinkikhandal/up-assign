@@ -1,91 +1,129 @@
-import { useState, useEffect, useRef } from "react";
-// NOT OPTIMIZED FULLY-----
+import { useState, useEffect, useRef, useMemo } from "react";
+import Popup from "../subComponents/Popup";
+
+// MISTAKES REMAINING WILL FIX LATER ++++++++++++++++++++++++++++
+
 export const UserDataForm = () => {
-  const initialState = { name: "", email: "" };
-  const [formData, setFormData] = useState(initialState);
-  const [originalData, setOriginalData] = useState({});
-  const isFormChanged = useRef(false);
+  const generateId = () => `user-${Date.now()}`;
 
-  // Load stored data on mount
-  useEffect(() => {
-    const storedData = JSON.parse(localStorage.getItem("userForm")) || {};
-    setFormData(storedData);
-    setOriginalData(storedData);
-  }, []);
+  // Get stored user data from localStorage (if available)
+  const storedUser = JSON.parse(localStorage.getItem("userData")) || null;
 
-  // Warn user before leaving with unsaved changes
+  const [user, setUser] = useState({
+    id: generateId(),
+    name: "",
+    address: "",
+    email: "",
+    phone: "",
+  });
+
+  const initialFormData = useRef({ storedUser, user });
+
+  const [openPopup, setOpenPopup] = useState({ isOpen: false, message: "" });
+
+  const hasChanged = useMemo(() => {
+    return (
+      JSON.stringify(user) !== JSON.stringify(initialFormData.current.user) &&
+      JSON.stringify(user) !==
+        JSON.stringify(initialFormData.current.storedUser)
+    );
+  }, [user]);
+
+  // Warn user about unsaved changes before leaving
   useEffect(() => {
-    const handleBeforeUnload = (event) => {
-      if (isFormChanged.current) {
-        event.preventDefault();
-        event.returnValue = "You have unsaved changes!";
-      }
+    if (!hasChanged) return;
+
+    const handleBeforeUnload = (e) => {
+      e.preventDefault();
+      e.returnValue = "You have unsaved changes. Do you really want to leave?";
     };
 
     window.addEventListener("beforeunload", handleBeforeUnload);
-    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
-  }, []);
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [hasChanged]);
 
-  // Handle input change and track meaningful changes
   const handleChange = (e) => {
     const { name, value } = e.target;
-    const trimmedValue = value.trim();
-
-    setFormData((prev) => {
-      const updatedData = { ...prev, [name]: value };
-
-      // Detect actual changes
-      if (trimmedValue !== (originalData[name] || "").trim()) {
-        isFormChanged.current = true;
-      } else {
-        isFormChanged.current = Object.keys(updatedData).some(
-          (key) => updatedData[key].trim() !== (originalData[key] || "").trim()
-        );
-      }
-
-      return updatedData;
-    });
+    setUser((prev) => ({ ...prev, [name]: value.trim() })); // Removes leading spaces
   };
 
-  // Handle form submission
   const handleSubmit = (e) => {
     e.preventDefault();
-    const storedData = JSON.parse(localStorage.getItem("userForm")) || {};
+    localStorage.setItem("userData", JSON.stringify(user));
 
-    // Only save if there are actual changes
-    if (JSON.stringify(formData).trim() !== JSON.stringify(storedData).trim()) {
-      localStorage.setItem("userForm", JSON.stringify(formData));
-      setOriginalData(formData);
-      isFormChanged.current = false;
-    }
+    setOpenPopup({ isOpen: true, message: "Data saved successfully!" });
 
-    // Reset form fields after submission
-    setFormData(initialState);
+    // initialFormData.current = { ...user }; // Update initial data after save
+
+    setUser({ id: generateId(), name: "", address: "", email: "", phone: "" });
+  };
+
+  const cancelPopupOpen = () => {
+    setOpenPopup({ isOpen: false, message: "" });
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <label>
-        Name:{" "}
-        <input
-          type="text"
-          name="name"
-          value={formData.name}
-          onChange={handleChange}
-        />
-      </label>
-      <br />
-      <label>
-        Email:{" "}
-        <input
-          type="email"
-          name="email"
-          value={formData.email}
-          onChange={handleChange}
-        />
-      </label>
-      <br />
-      <button type="submit">Save</button>
-    </form>
+    <>
+      {openPopup.isOpen && (
+        <Popup message={openPopup.message} cancelPopupOpen={cancelPopupOpen} />
+      )}
+      <main className="flex w-[100%] min-h-[100dvh] overflow-y-auto">
+        <div className="content-grid w-[100%]">
+          <div className="form-container m-auto">
+            <h2 className="heading">User Data Form</h2>
+            <form onSubmit={handleSubmit}>
+              <div className="inp-div">
+                <label htmlFor="name">Name:</label>
+                <input
+                  type="text"
+                  id="name"
+                  name="name"
+                  value={user.name}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+              <div className="inp-div">
+                <label htmlFor="address">Address:</label>
+                <textarea
+                  id="address"
+                  name="address"
+                  value={user.address}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+              <div className="inp-div">
+                <label htmlFor="email">Email:</label>
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  value={user.email}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+              <div className="inp-div">
+                <label htmlFor="phone">Phone:</label>
+                <input
+                  type="tel"
+                  id="phone"
+                  name="phone"
+                  value={user.phone}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+              <button className="btn" type="submit">
+                Save
+              </button>
+            </form>
+          </div>
+        </div>
+      </main>
+    </>
   );
 };
