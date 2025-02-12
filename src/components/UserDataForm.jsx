@@ -1,12 +1,14 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import Popup from "../subComponents/Popup";
 
-// MISTAKES REMAINING WILL FIX LATER ++++++++++++++++++++++++++++
+// I Think Problem Solved ++++++++++++++++++++++++++++
 
 export const UserDataForm = () => {
   const generateId = () => `user-${Date.now()}`;
 
   // Get stored user data from localStorage (if available)
+  // getting this is necessary because if the user by chance does reload the page the useRef value will be null (if we did it diff way i.e. by having an object in useRef with storedData (which will be saved when the user submits the form), and user.) and we won't be able to compare it with the stored value in database (or localStorage)
+  // useCase when we don't unnecessarily want to store the value again that is already present (will be more efficient at backend) OR MAY be it is redundant as we are still fetching the data once???
   const storedUser = JSON.parse(localStorage.getItem("userData")) || null;
 
   const [user, setUser] = useState({
@@ -17,16 +19,26 @@ export const UserDataForm = () => {
     phone: "",
   });
 
-  const initialFormData = useRef({ storedUser, user });
+  const initialFormData = useRef(user);
 
   const [openPopup, setOpenPopup] = useState({ isOpen: false, message: "" });
 
   const hasChanged = useMemo(() => {
-    return (
-      JSON.stringify(user) !== JSON.stringify(initialFormData.current.user) &&
-      JSON.stringify(user) !==
-        JSON.stringify(initialFormData.current.storedUser)
-    );
+    const { id, ...userWithoutId } = user;
+    const { id: storedId, ...storedUserWithoutId } = storedUser || {};
+    const { id: initialUserId, ...initialUserWithoutId } =
+      initialFormData.current || {};
+
+    for (let key in userWithoutId) {
+      if (
+        userWithoutId[key] !== storedUserWithoutId[key] &&
+        userWithoutId[key] !== initialUserWithoutId[key]
+      ) {
+        return true; // Data has changed
+      }
+    }
+
+    return false; // No changes detected
   }, [user]);
 
   // Warn user about unsaved changes before leaving
@@ -55,7 +67,7 @@ export const UserDataForm = () => {
 
     setOpenPopup({ isOpen: true, message: "Data saved successfully!" });
 
-    // initialFormData.current = { ...user }; // Update initial data after save
+    initialFormData.current.storedData = { ...user }; // Update initial data after save
 
     setUser({ id: generateId(), name: "", address: "", email: "", phone: "" });
   };
